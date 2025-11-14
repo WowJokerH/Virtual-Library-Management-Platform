@@ -1,4 +1,4 @@
-import {
+﻿import {
   BarChart,
   Bar,
   XAxis,
@@ -18,12 +18,15 @@ import { useLibraryStats } from '@/hooks/useLibraryStats'
 import { useAdminDashboardData } from '@/hooks/useAdminDashboardData'
 import { formatDateTime } from '@/lib/utils'
 
-const categoryData = [
-  { name: '文学', value: 35, color: '#3B82F6' },
-  { name: '历史', value: 25, color: '#10B981' },
-  { name: '计算机', value: 20, color: '#F59E0B' },
-  { name: '经济', value: 15, color: '#EF4444' },
-  { name: '其他', value: 5, color: '#8B5CF6' },
+const CATEGORY_COLOR_PALETTE = [
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+  '#6366F1',
+  '#14B8A6',
+  '#F472B6',
 ]
 
 export function Admin() {
@@ -92,6 +95,7 @@ function Dashboard() {
 
   const borrowTrend = adminData?.borrowTrend ?? []
   const recentActivities = adminData?.recentActivities ?? []
+  const categoryDistribution = adminData?.categoryDistribution ?? []
   const activityActionLabel = {
     borrow: '借阅',
     return: '归还',
@@ -191,23 +195,42 @@ function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {dashboardLoading ? (
+              <div className="h-[300px] flex items-center justify-center text-gray-400">
+                数据加载中...
+              </div>
+            ) : categoryDistribution.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-gray-400">
+                暂无分类数据
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={categoryDistribution}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                    }
+                  >
+                    {categoryDistribution.map((entry, index) => (
+                      <Cell
+                        key={`cell-${entry.name}`}
+                        fill={
+                          CATEGORY_COLOR_PALETTE[
+                            index % CATEGORY_COLOR_PALETTE.length
+                          ]
+                        }
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>

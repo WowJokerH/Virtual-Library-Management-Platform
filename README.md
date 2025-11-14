@@ -9,6 +9,8 @@
 - **读者互动**：详情页可评分与评论，自动累计平均分与评论数量。
 - **管理面板**：仪表盘展示总册数、注册用户、当前借阅、借阅趋势、最近操作，并提供图书增删改 UI。
 
+
+
 ## 界面预览
 ![Login Screenshot](pictures/image1.png)
 ![Dashboard Screenshot](pictures/image2.png)
@@ -83,4 +85,3 @@ src/
 
 ## 许可证
 MIT License
-

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import type { Book } from '@/types'
@@ -11,6 +10,25 @@ interface BookFormProps {
   onSuccess?: () => void
   onCancel?: () => void
 }
+
+const CATEGORY_OPTIONS = [
+  '文学',
+  '历史',
+  '哲学',
+  '经济',
+  '管理',
+  '计算机',
+  '数学',
+  '心理学',
+  '教育',
+  '艺术',
+  '工程',
+  '医学',
+  '旅行',
+  '社会科学',
+  '科普',
+  '其他',
+]
 
 export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   const [formData, setFormData] = useState({
@@ -27,14 +45,14 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   })
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+
     try {
       setLoading(true)
-      
+
       if (book) {
-        const updateData = {
+        await updateBookInLocalDb(book.id, {
           title: formData.title,
           author: formData.author,
           isbn: formData.isbn,
@@ -45,11 +63,10 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
           stock: formData.stock,
           available: formData.available,
           cover_image: formData.cover_image,
-        }
-        await updateBookInLocalDb(book.id, updateData)
+        })
         toast.success('图书信息更新成功！')
       } else {
-        const insertData = {
+        await createBookInLocalDb({
           title: formData.title,
           author: formData.author,
           isbn: formData.isbn,
@@ -60,35 +77,29 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
           stock: formData.stock,
           available: formData.available,
           cover_image: formData.cover_image,
-        }
-        await createBookInLocalDb(insertData)
+        })
         toast.success('图书添加成功！')
       }
-      
+
       onSuccess?.()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '操作失败')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '操作失败')
     } finally {
       setLoading(false)
     }
   }
 
-  const categories = [
-    '文学', '历史', '哲学', '经济', '管理', '计算机', '数学', '物理', 
-    '化学', '生物', '医学', '工程', '艺术', '教育', '心理学', '法律'
-  ]
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="图书标题 *"
+          label="图书名称 *"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
-          placeholder="请输入图书标题"
+          placeholder="请输入图书名称"
         />
-        
+
         <Input
           label="作者 *"
           value={formData.author}
@@ -96,84 +107,110 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
           required
           placeholder="请输入作者姓名"
         />
-        
+
         <Input
           label="ISBN *"
           value={formData.isbn}
           onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
           required
-          placeholder="请输入ISBN号"
+          placeholder="请输入 ISBN 编号"
         />
-        
+
         <Input
           label="出版社"
           value={formData.publisher}
-          onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, publisher: e.target.value })
+          }
           placeholder="请输入出版社"
         />
-        
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">分类 *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            分类 *
+          </label>
           <select
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">请选择分类</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+            {CATEGORY_OPTIONS.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </div>
-        
+
         <Input
           label="出版日期"
           type="date"
           value={formData.publish_date}
-          onChange={(e) => setFormData({ ...formData, publish_date: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, publish_date: e.target.value })
+          }
         />
-        
+
         <Input
-          label="库存数量 *"
+          label="总册数 *"
           type="number"
           min="1"
           value={formData.stock}
-          onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 1 })}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              stock: Number(e.target.value) || 1,
+            })
+          }
           required
         />
-        
+
         <Input
           label="可借数量 *"
           type="number"
           min="0"
           value={formData.available}
-          onChange={(e) => setFormData({ ...formData, available: parseInt(e.target.value) || 0 })}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              available: Number(e.target.value) || 0,
+            })
+          }
           required
         />
       </div>
-      
+
       <Input
-        label="封面图片URL"
+        label="封面图片 URL"
         value={formData.cover_image}
-        onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-        placeholder="请输入封面图片URL"
+        onChange={(e) =>
+          setFormData({ ...formData, cover_image: e.target.value })
+        }
+        placeholder="请输入图书封面链接"
       />
-      
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">简介</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          简介
+        </label>
         <textarea
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           rows={4}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="请输入图书简介"
         />
       </div>
-      
+
       <div className="flex space-x-3">
         <Button type="submit" loading={loading}>
-          {book ? '更新' : '添加'}
+          {book ? '保存' : '创建'}
         </Button>
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel}>

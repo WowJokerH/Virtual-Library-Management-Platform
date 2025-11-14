@@ -102,7 +102,14 @@ export interface RecentActivity {
   timestamp: string;
 }
 
+export interface CategoryDistributionItem {
+  name: string;
+  value: number;
+  [key: string]: string | number;
+}
+
 export interface AdminDashboardData {
   borrowTrend: BorrowTrendPoint[];
   recentActivities: RecentActivity[];
+  categoryDistribution: CategoryDistributionItem[];
 }

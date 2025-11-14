@@ -17,13 +17,14 @@ export function BookManagement() {
   const [editingBook, setEditingBook] = useState<Book | undefined>()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  
+
   const { books, loading, refetch, total } = useBooks(
     { search: searchQuery },
-    { page, limit: pageSize }
+    { page, limit: pageSize },
   )
 
-  const totalPages = Math.max(1, Math.ceil((total || 0) / pageSize))
+  const totalCount = total ?? 0
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
   const handleAddBook = () => {
     setEditingBook(undefined)
@@ -36,7 +37,7 @@ export function BookManagement() {
   }
 
   const handleDeleteBook = async (bookId: string, title: string) => {
-    if (!confirm(`确定要删除图书《${title}》吗？`)) {
+    if (!confirm(`确认要删除图书 "${title}" 吗？`)) {
       return
     }
 
@@ -64,7 +65,7 @@ export function BookManagement() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{editingBook ? '编辑图书' : '添加图书'}</CardTitle>
+          <CardTitle>{editingBook ? '编辑图书' : '新增图书'}</CardTitle>
         </CardHeader>
         <CardContent>
           <BookForm
@@ -83,7 +84,7 @@ export function BookManagement() {
         <h2 className="text-2xl font-bold text-gray-900">图书管理</h2>
         <Button onClick={handleAddBook}>
           <Plus className="w-4 h-4 mr-2" />
-          添加图书
+          新增图书
         </Button>
       </div>
 
@@ -91,7 +92,7 @@ export function BookManagement() {
         <CardHeader>
           <div className="flex items-center space-x-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 type="text"
                 placeholder="搜索图书标题或作者..."
@@ -126,12 +127,15 @@ export function BookManagement() {
         <CardContent>
           {loading ? (
             <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="animate-pulse flex items-center space-x-4 p-4 border rounded-lg">
-                  <div className="w-12 h-16 bg-gray-200 rounded"></div>
+              {[...Array(5)].map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse flex items-center space-x-4 p-4 border rounded-lg"
+                >
+                  <div className="w-12 h-16 bg-gray-200 rounded" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
                   </div>
                 </div>
               ))}
@@ -144,11 +148,14 @@ export function BookManagement() {
           ) : (
             <div className="space-y-4">
               {books.map((book) => (
-                <div key={book.id} className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50">
+                <div
+                  key={book.id}
+                  className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50"
+                >
                   <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
                     {book.cover_image ? (
-                      <img 
-                        src={book.cover_image} 
+                      <img
+                        src={book.cover_image}
                         alt={book.title}
                         className="w-full h-full object-cover rounded"
                       />
@@ -156,17 +163,21 @@ export function BookManagement() {
                       <BookOpen className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{book.title}</h3>
+                    <h3 className="font-semibold text-gray-900 truncate">
+                      {book.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{book.author}</p>
                     <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
                       <span>ISBN: {book.isbn}</span>
                       <span>分类: {book.category}</span>
-                      <span>库存: {book.available}/{book.stock}</span>
+                      <span>
+                        库存: {book.available}/{book.stock}
+                      </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Button
                       size="sm"
@@ -188,9 +199,10 @@ export function BookManagement() {
               ))}
             </div>
           )}
+
           <div className="flex items-center justify-between pt-4 border-t text-sm text-gray-600">
             <span>
-              共 {total} 条记录，第 {page}/{totalPages} 页
+              共 {totalCount.toLocaleString()} 条记录，第 {page}/{totalPages} 页
             </span>
             <div className="space-x-2">
               <Button

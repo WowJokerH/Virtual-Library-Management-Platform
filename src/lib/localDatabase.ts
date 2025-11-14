@@ -607,9 +607,27 @@ export const getAdminDashboardDataFromLocalDb =
       returned,
     }))
 
+    const categoryDistributionMap = new Map<string, number>()
+    db.books.forEach((book) => {
+      const categoryName =
+        book.category && book.category.trim().length > 0
+          ? book.category.trim()
+          : '未分类'
+
+      categoryDistributionMap.set(
+        categoryName,
+        (categoryDistributionMap.get(categoryName) ?? 0) + 1,
+      )
+    })
+
+    const categoryDistribution = Array.from(categoryDistributionMap.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+
     return {
       borrowTrend,
       recentActivities,
+      categoryDistribution,
     }
   }
 
