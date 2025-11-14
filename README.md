@@ -9,15 +9,13 @@
 - **读者互动**：详情页可评分与评论，自动累计平均分与评论数量。
 - **管理面板**：仪表盘展示总册数、注册用户、当前借阅、借阅趋势、最近操作，并提供图书增删改 UI。
 
-
-
 ## 界面预览
-| 登录/注册 | 仪表盘概览 | 图书管理 |
-| --- | --- | --- |
-| ![Login Screenshot](pictures/image1.png) | ![Dashboard Screenshot](pictures/image2.png) | ![Book Management Screenshot](pictures/image3.png) |
-| 借阅列表 | 借阅详情 | 统计与趋势 |
-| --- | --- | --- |
-| ![Borrow List Screenshot](pictures/image4.png) | ![Borrow Detail Screenshot](pictures/image5.png) | ![Statistics Screenshot](pictures/image6.png) |
+![Login Screenshot](pictures/image1.png)
+![Dashboard Screenshot](pictures/image2.png)
+![Book Management Screenshot](pictures/image3.png)
+![Borrow List Screenshot](pictures/image4.png)
+![Borrow Detail Screenshot](pictures/image5.png)
+![Statistics Screenshot](pictures/image6.png)
 
 ## 技术栈
 - **框架**：React 18 · TypeScript · Vite
@@ -85,3 +83,4 @@ src/
 
 ## 许可证
 MIT License
+
